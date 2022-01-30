@@ -2,6 +2,24 @@
 
 -----
 
+## 3. 2022-02-06
+
+### Backtracking
+
+[47. Permutations II](https://leetcode.com/problems/permutations-ii/)
+
+[301. Remove Invalid Parentheses](https://leetcode.com/problems/remove-invalid-parentheses/)
+
+[494. Target Sum](https://leetcode.com/problems/target-sum/)
+
+### Greedy
+
+[767. Reorganize String](https://leetcode.com/problems/reorganize-string/)
+
+[1011. Capacity To Ship Packages Within D Days](https://leetcode.com/problems/capacity-to-ship-packages-within-d-days/)
+
+-----
+
 ## 2. 2022-01-30
 
 ### Heap
