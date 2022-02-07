@@ -2,6 +2,34 @@
 
 -----
 
+## 4. 2022-02-13
+
+### DFS
+
+[529. Minesweeper](https://leetcode.com/problems/minesweeper/)
+
+[863. All Nodes Distance K in Binary Tree](https://leetcode.com/problems/all-nodes-distance-k-in-binary-tree/)
+
+[332. Reconstruct Itinerary](https://leetcode.com/problems/reconstruct-itinerary/)
+
+### Backtracking
+
+[526. Beautiful Arrangement](https://leetcode.com/problems/beautiful-arrangement/)
+
+[78. Subsets](https://leetcode.com/problems/subsets/)
+
+### Unfinished
+
+[1011. Capacity To Ship Packages Within D Days](https://leetcode.com/problems/capacity-to-ship-packages-within-d-days/)
+
+[282. Expression Add Operators](https://leetcode.com/problems/expression-add-operators/)
+
+[212. Word Search II](https://leetcode.com/problems/word-search-ii/)
+
+[317. Shortest Distance from All Buildings](https://leetcode.com/problems/shortest-distance-from-all-buildings/)
+
+-----
+
 ## 3. 2022-02-06
 
 ### Backtracking
