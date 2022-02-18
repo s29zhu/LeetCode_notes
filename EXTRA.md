@@ -1,0 +1,281 @@
+## [1945. Sum of Digits of String After Convert](https://leetcode.com/problems/sum-of-digits-of-string-after-convert/)
+
+```c++
+class Solution {
+ public:
+  int getLucky(string s, int k) {
+    vector<int> digits = move(convert_digits(s));
+    int rst = accumulate(digits.begin(), digits.end(), 0);
+    for (int i = 1; i < k; ++i) rst = sum_digits(rst);
+    return rst;
+  }
+  int sum_digits(int a) {
+    int s = 0;
+    for (int i = 1; i <= a; i *= 10) s += (a / i) % 10;
+    return s;
+  }
+  vector<int> convert_digits(const string& s) {
+    vector<int> rst;
+    rst.reserve(s.size() * 2);
+    for (auto& i : s) {
+      if (i >= 't') {
+        rst.push_back(2);
+        rst.push_back(i - 't');
+      } else if (i >= 'j') {
+        rst.push_back(1);
+        rst.push_back(i - 'j');
+      } else {
+        rst.push_back(i - 'a' + 1);
+      }
+    }
+    rst.shrink_to_fit();
+    return rst;
+  }
+};
+```
+
+## [1818. Minimum Absolute Sum Difference](https://leetcode.com/problems/minimum-absolute-sum-difference/)
+
+```c++
+class Solution {
+ public:
+  int minAbsoluteSumDiff(vector<int>& nums1, vector<int>& nums2) {
+    vector<int> s = nums1;
+    sort(s.begin(), s.end());
+    long max_dec = 0, sum = 0;
+    for (int i = 0; i < nums2.size(); ++i) {
+      long ss = abs(nums2[i] - nums1[i]);
+      if (ss > max_dec) {
+        long dec = ss - abs(nums2[i] - nearest(s, nums2[i]));
+        if (dec > max_dec) max_dec = dec;
+      }
+      sum += ss;
+    }
+    return (sum - max_dec) % 1000000007;
+  }
+  int nearest(const vector<int>& s, int q) {
+    if (q <= s.front()) return s.front();
+    if (q >= s.back()) return s.back();
+
+    int low = 0, high = s.size() - 1, mid = (low + high) / 2;
+    while (low != mid) {
+      if (q == s[mid]) return q;
+      if (q > s[mid]) low = mid;
+      else high = mid;
+      mid = (low + high) / 2;
+    }
+    return abs(q - s[low]) < abs(s[high] - q) ? s[low] : s[high];
+  }
+};
+```
+
+> Note: for each element, before computing the potential decrease of the difference, check if the current difference is lower than the maximum decrease. If the existing difference is lower than the maximum decrease, we don't need to bother whether it can have a larger decrease.
+
+## [1137. N-th Tribonacci Number](https://leetcode.com/problems/n-th-tribonacci-number/description/)
+
+### Space O(1)
+
+```c++
+class Solution {
+ public:
+  int tribonacci(int n) {
+    array<int, 4> a{0, 1, 1, 2};
+    if (n < 4) return a[n];
+    for (int i = 3; i < n; ++i) {
+      a[0] = a[1];
+      a[1] = a[2];
+      a[2] = a[3];
+      a[3] = a[0] + a[1] + a[2];
+    }
+    return a[3];
+  }
+};
+```
+
+### More compact
+
+```c++
+class Solution {
+ public:
+  int tribonacci(int n) {
+    array<int, 3> a{0, 1, 1};
+    for (int i = 3; i <= n; ++i)
+      a[i % 3] = a[(i - 1) % 3] + a[(i - 2) % 3] + a[i % 3];
+    return a[n % 3];
+  }
+};
+```
+
+## [746. Min Cost Climbing Stairs](https://leetcode.com/problems/min-cost-climbing-stairs/)
+
+Compute the minimum cost for stepping on ith stair.
+
+```c++
+class Solution {
+ public:
+  int minCostClimbingStairs(vector<int>& cost) {
+    array<int, 2> a{cost[0], cost[1]};
+    for (int i = 2; i < cost.size(); ++i)
+      a[i % 2] = min(a[i % 2], a[(i - 1) % 2]) + cost[i];
+    return min(a[0], a[1]);
+  }
+};
+```
+
+## [88. Merge Sorted Array](https://leetcode.com/problems/merge-sorted-array/)
+
+```c++
+class Solution {
+ public:
+  void merge(vector<int>& nums1, int m, vector<int>& nums2, int n) {
+    for (int i = m - 1, j = n - 1, k = m + n - 1; k >= 0; --k)
+      if (j < 0 && i >= 0)
+        nums1[k] = nums1[i--];
+      else if (i < 0 && j >= 0)
+        nums1[k] = nums2[j--];
+      else if (nums1[i] > nums2[j])
+        nums1[k] = nums1[i--];
+      else
+        nums1[k] = nums2[j--];    
+  }
+};
+```
+
+## [740. Delete and Earn](https://leetcode.com/problems/delete-and-earn/)
+
+[Similar: House Robber](2022-01-23.md#198-house-robber)
+
+```c++
+class Solution {
+ public:
+  int deleteAndEarn(vector<int>& nums) {
+    if (nums.size() == 1) return nums[0];
+    map<int, int> counts;
+    for (auto i : nums) ++counts[i];
+    int N = counts.size();
+    vector<int> ns, val;
+    ns.reserve(N);
+    val.reserve(N);
+    for (auto& i : counts) {
+      ns.push_back(i.first);
+      val.push_back(i.first * i.second);
+    }
+    vector<int> dp(N);
+    dp[0] = val[0];
+    dp[1] = ns[1] - 1 != ns[0] ? val[0] + val[1] : max(val[0], val[1]);
+    for (int i = 2; i < N; ++i)
+      dp[i] = ns[i] - 1 != ns[i - 1] ? dp[i - 1] + val[i] : max(dp[i - 2] + val[i], dp[i - 1]);
+    return dp.back();
+  }
+};
+```
+
+## [55. Jump Game](https://leetcode.com/problems/jump-game/)
+
+### Simple simulation
+
+Time: O(N^2), Space: O(N)
+
+Equivalent to BFS. Each number v in the nums gives v edges.
+
+```c++
+class Solution {
+ public:
+  bool canJump(vector<int>& nums) {
+    int N = nums.size();
+    vector<bool> v(N, false);
+    v[0] = true;
+    for (int i = 0; i < N; ++i)
+      if (v[i])
+        for (int j = i + 1; j <= nums[i] + i; ++j)
+          if (j < N - 1)
+            v[j] = true;
+          else
+            return true;
+    return v.back();
+  }
+};
+```
+
+### Optimized
+
+Since we can choose jump [1 ~ N] steps if we stand on a N, the squares can be reached are consecutive. So we can just focus on the furthest index which indicates all the indices less than it are reachable.
+
+```c++
+class Solution {
+ public:
+  bool canJump(vector<int>& nums) {
+    for (int i = 0, max_i = nums[0], N = nums.size(); i < N && i <= max_i; ++i)
+      if ((max_i = max(max_i, nums[i] + i)) >= N - 1) return true;
+    return false;
+  }
+};
+```
+
+**Why is this slower than the following solution?**
+
+### Reversed DP in Solution
+
+```c++
+class Solution {
+ public:
+  bool canJump(vector<int>& nums) {
+    int j = nums.size() - 1;
+    for (int i = j; i >= 0; i--)
+      if (i + nums[i] >= j) j = i;
+    return j == 0;
+  }
+};
+```
+
+## [45. Jump Game II](https://leetcode.com/problems/jump-game-ii/)
+
+### BFS
+
+```c++
+class Solution {
+ public:
+  int jump(vector<int>& nums) {
+    int n = 1, N = nums.size();
+    if (N == 1) return 0;
+    vector<bool> visited(N, false);
+    vector<int> curr_lvl{0};
+    while (true) {
+      vector<int> next_lvl;
+      for (auto i : curr_lvl)
+        for (int j = 1; j <= nums[i]; ++j) {
+          if (i + j >= N - 1) return n;
+          if (visited[i + j]) continue;
+          next_lvl.push_back(i + j);
+          visited[i + j] = true;
+        }
+      ++n;
+      curr_lvl.swap(next_lvl);
+    }
+    return -1;
+  }
+};
+```
+
+### Optimized
+
+```c++
+class Solution {
+ public:
+  int jump(vector<int>& nums) {
+    int N = nums.size(), n = 1, prev_max = 0, curr_max = nums[0];
+    if (N == 1) return 0;
+    for (int i = 0; i < N; ++i) {
+      if (i > prev_max) {
+        prev_max = curr_max;
+        ++n;
+      }
+      int j = i + nums[i];
+      if (j >= N - 1) return n;
+      if (j > curr_max) curr_max = j;
+    }
+    return -1;
+  }
+};
+```
+
