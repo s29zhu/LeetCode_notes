@@ -279,3 +279,91 @@ class Solution {
 };
 ```
 
+## [53. Maximum Subarray](https://leetcode.com/problems/maximum-subarray/)
+
+### Two pointers
+
+1. For left end, discard the [p1, i) if the partial sum becomes less than zero.
+2. For right end, discard the (j, P2] if the partial sum becomes less than zero.
+3. Move the side on which the partial sum is smaller. This is to avoid the above discarding strategy misses the larger side, e.g. in {1, 2, 3, 4, 5, -100, 6, 7}, if we keep moving left index, the -100 will make the 1~5 looks like not worthy, and we end up with {6, 7}.
+
+```c++
+class Solution {
+ public:
+  int maxSubArray(const vector<int>& nums) {
+    int N = nums.size();
+    if (N == 1) return nums[0];
+    int p1 = 0, p2 = N - 1, s1 = nums[p1], s2 = nums[p2];
+    int i = p1, j = p2;
+    while (i < j) {
+      if (s1 < s2) {
+        ++i;
+        if (s1 < 0) {
+          p1 = i;
+          s1 = 0;
+        }
+        if (i != j) s1 += nums[i];
+      } else {
+        --j;
+        if (s2 < 0) {
+          p2 = j;
+          s2 = 0;
+        }
+        if (i != j) s2 += nums[j];
+      }
+    }
+    return s1 + s2;
+  }
+};
+```
+
+p1 and p2 can be omitted:
+```c++
+class Solution {
+ public:
+  int maxSubArray(const vector<int>& nums) {
+    int N = nums.size();
+    if (N == 1) return nums[0];
+    int s1 = nums[0], s2 = nums[N - 1];
+    int i = 0, j = N - 1;
+    while (i < j) {
+      if (s1 < s2) {
+        ++i;
+        if (s1 < 0) s1 = 0;
+        if (i != j) s1 += nums[i];
+      } else {
+        --j;
+        if (s2 < 0) s2 = 0;
+        if (i != j) s2 += nums[j];
+      }
+    }
+    return s1 + s2;
+  }
+};
+```
+
+### Dynamic programming
+
+Use a vectoring to keep the maximum sum which can be obtained by selecting the current element as the last.
+
+```c++
+class Solution {
+ public:
+  int maxSubArray(vector<int>& nums) {
+    int N = nums.size();
+    vector<int> dp(N);
+
+    dp[0] = nums[0];
+    int m = nums[0];
+
+    for (int i = 1; i < N; ++i) {
+      dp[i] = nums[i] + (dp[i - 1] > 0 ? dp[i - 1] : 0);
+      m = max(m, dp[i]);
+    }
+    return m;
+  }
+};
+```
+
+The difference between the two methods is the first one always keeps the result optimum, while the second one computes all the partial sums and then compare.
+
