@@ -367,3 +367,60 @@ class Solution {
 
 The difference between the two methods is the first one always keeps the result optimum, while the second one computes all the partial sums and then compare.
 
+
+## [918. Maximum Sum Circular Subarray](https://leetcode.com/problems/maximum-sum-circular-subarray/)
+
+Consider two cases:
+
+1. The first and last elements may not be both in the result. Same as [53. Maximum Subarray.](#53-maximum-subarray)
+2. The first and last elements are both in the result. This is equivalent to find minimum subarray without considering the first and last elements. Then subtract the partial sum from the total sum.
+
+Compute the maximum for each case, then return the larger one.
+
+```c++
+class Solution {
+ public:
+  int maxSubarraySumCircular(vector<int>& nums) {
+    int N = nums.size();
+    if (N == 1) return nums[0];
+
+    int m1 = nums[0], m2 = nums[1];
+    vector<int> v(N, m1);
+    for (int i = 1; i < N; ++i) {
+      v[i] = nums[i] + (v[i - 1] < 0 ? 0 : v[i - 1]);
+      m1 = max(m1, v[i]);
+    }
+    v[1] = m2;
+    for (int i = 2; i < N - 1; ++i) {
+      v[i] = nums[i] + (v[i - 1] > 0 ? 0 : v[i - 1]);
+      m2 = min(m2, v[i]);
+    }
+    int s = std::accumulate(nums.begin(), nums.end(), 0);
+    return max(m1, s - m2);
+  }
+};
+```
+
+
+```c++
+class Solution {
+ public:
+  int maxSubarraySumCircular(const vector<int>& nums) {
+    int N = nums.size();
+    if (N == 1) return nums[0];
+
+    int m1 = nums[0], m2 = nums[1];
+    array<int, 2> d1{nums[0], 0}, d2{0, nums[1]};
+    for (int i = 1; i < N; ++i) {
+      int j1 = i % 2, j2 = (i + 1) % 2;
+      d1[j1] = nums[i] + (d1[j2] < 0 ? 0 : d1[j2]);
+      m1 = max(d1[j1], m1);
+      if (i > N - 3) continue;
+      d2[j2] = nums[i + 1] + (d2[j1] > 0 ? 0 : d2[j1]);
+      m2 = min(d2[j2], m2);
+    }
+    int s = std::accumulate(nums.begin(), nums.end(), 0);
+    return max(m1, s - m2);
+  }
+};
+```
