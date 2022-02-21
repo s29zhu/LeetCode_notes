@@ -2,6 +2,27 @@
 
 -----
 
+## [5. 2022-02-27]
+
+### Bitmask
+
+[526. Beautiful Arrangement](https://leetcode.com/problems/beautiful-arrangement/)
+
+[698. Partition to K Equal Sum Subsets](https://leetcode.com/problems/partition-to-k-equal-sum-subsets/)
+
+### Array
+
+[5. Longest Palindromic Substring](https://leetcode.com/problems/longest-palindromic-substring/)
+
+[9. Palindrome Number](https://leetcode.com/problems/palindrome-number/)
+
+[336. Palindrome Pairs](https://leetcode.com/problems/palindrome-pairs/)
+
+### Backtracking
+
+[37. Sudoku Solver](https://leetcode.com/problems/sudoku-solver/)
+
+
 ## [4. 2022-02-20](2022-02-20.md)
 
 ### DFS
