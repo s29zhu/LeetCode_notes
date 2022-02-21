@@ -424,3 +424,114 @@ class Solution {
   }
 };
 ```
+
+## [152. Maximum Product Subarray](https://leetcode.com/problems/maximum-product-subarray/)
+
+Compute and record both the positive and negative products (maximum abs).
+
+```c++
+class Solution {
+ public:
+  int maxProduct(vector<int>& nums) {
+    int N = nums.size();
+    if (N == 1) return nums[0];
+    vector<int> vp(N), vn(N);
+    vp[0] = nums[0];
+    vn[0] = nums[0];
+    int max_p = nums[0];
+    for (int i = 1; i < N; ++i) {
+      if (nums[i] > 0) {
+        vp[i] = (vp[i - 1] > 0 ? vp[i - 1] : 1) * nums[i];
+        vn[i] = vn[i - 1] * nums[i];
+      } else {
+        vp[i] = vn[i - 1] * nums[i];
+        vn[i] = (vp[i - 1] > 0 ? vp[i - 1] : 1) * nums[i];
+      }
+      max_p = max(max_p, vp[i]);
+    }
+    return max_p;
+  }
+};
+```
+
+### Optimized
+
+```c++
+class Solution {
+ public:
+  int maxProduct(vector<int>& nums) {
+    int N = nums.size();
+    int pmax = nums[0], pmin = nums[0];
+    int m = nums[0];
+
+    for (int i = 1; i < N; ++i) {
+      if (nums[i] < 0) swap(pmax, pmin);
+      pmax = max(nums[i], pmax * nums[i]);
+      pmin = min(nums[i], pmin * nums[i]);
+      m = max(m, pmax);
+    }
+    return m;
+  }
+};
+```
+
+## [1567. Maximum Length of Subarray With Positive Product](https://leetcode.com/problems/maximum-length-of-subarray-with-positive-product/description/)
+
+The common idea of the DP with subarray (consecutive): to consider the state if applying the current element, since the consecutive condition requires that the previous one must be applied if the next one is applied. Therefore the transfer relation can be obtained.
+
+```c++
+class Solution {
+ public:
+  int getMaxLen(const vector<int>& nums) {
+    int N = nums.size();
+    if (N == 1) return nums[0] > 0;
+    vector<int> vp(N), vn(N);
+    vp[0] = nums[0] > 0;
+    vn[0] = nums[0] < 0;
+    int m = 0;
+
+    for (int i = 1; i < N; ++i) {
+      if (nums[i] > 0) {
+        vp[i] = vp[i - 1] + 1;
+        vn[i] = vn[i - 1] == 0 ? 0 : vn[i - 1] + 1;
+      } else if (nums[i] < 0) {
+        vp[i] = vn[i - 1] == 0 ? 0 : vn[i - 1] + 1;
+        vn[i] = vp[i - 1] + 1;
+      } else {
+        vp[i] = 0;
+        vn[i] = 0;
+      }
+      m = max(m, vp[i]);
+    }
+
+    return m;
+  }
+};
+```
+
+### Optimized
+
+```c++
+class Solution {
+ public:
+  int getMaxLen(const vector<int>& nums) {
+    int N = nums.size();
+    int np = nums[0] > 0, nn = nums[0] < 0;
+    int m = np;
+
+    for (int i = 1; i < N; ++i) {
+      if (nums[i] == 0) {
+        np = 0;
+        nn = 0;
+      } else {
+        ++np;
+        if (nn != 0) ++nn;
+        if (nums[i] < 0) swap(np, nn);
+      }
+      m = max(m, np);
+    }
+
+    return m;
+  }
+};
+```
