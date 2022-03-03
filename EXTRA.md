@@ -538,7 +538,7 @@ class Solution {
 
 ## [1014. Best Sightseeing Pair](https://leetcode.com/problems/best-sightseeing-pair/)
 
-Maintain a pointer to the best choice of previous spots.
+Maintain a pointer to the best choice of previous spots. Similar as [11. Container With Most Water](https://leetcode.com/problems/container-with-most-water/).
 
 ```c++
 class Solution {
@@ -556,3 +556,134 @@ class Solution {
   }
 };
 ```
+
+## [139. Word Break](https://leetcode.com/problems/word-break/)
+
+### Trie + Backtrack
+
+__Time limit exceeded!__
+
+```c++
+class Solution {
+  struct Node {
+    char letter{'*'};
+    bool is_end{false};
+    Node* parent{nullptr};
+    unordered_map<char, Node*> children;
+
+    Node() = default;
+    Node(char c, Node* parent) : letter(c), parent(parent) {}
+    ~Node() {
+      for (auto& i : children) delete i.second;
+    }
+
+    Node* find(char c) {
+      return children.find(c) == children.end() ? nullptr : children[c];
+    }
+  };
+  struct Dictionary {
+    Node* root{nullptr};
+    Dictionary(const vector<string>& words) {
+      root = new Node();
+      for (auto& i : words) add_word(i);
+    }
+    ~Dictionary() { delete root; }
+
+    void add_word(const string& word) {
+      Node* node = root;
+      for (int i = 0; i < word.size(); ++i) {
+        Node* next = node->find(word[i]);
+        if (next) {
+          node = next;
+        } else {
+          build_link_list(word, i, node);
+          break;
+        }
+        if (i == word.size() - 1) next->is_end = true;
+      }
+    }
+
+    static void build_link_list(const string& word, int start, Node* root) {
+      Node* node = root;
+      for (int i = start; i < word.size(); ++i) {
+        auto n = new Node(word[i], node);
+        node->children[word[i]] = n;
+        node = n;
+      }
+      node->is_end = true;
+    }
+  };
+
+ public:
+  bool wordBreak(const string& s, vector<string>& wordDict) {
+    Dictionary dict(wordDict);
+
+    stack<Node*> node_stack;
+    node_stack.push(dict.root->find(s[0]));
+    int N = s.size();
+    vector<int> status(N, 0);
+
+    while (!node_stack.empty()) {
+      if (!node_stack.top()) {
+        node_stack.pop();
+        continue;
+      }
+
+      Node* t = node_stack.top();
+      int i = node_stack.size() - 1;
+      if (i == N - 1) {
+        if (t->is_end) return true;
+        node_stack.pop();
+      }
+
+      switch (status[i]) {
+        case 0:
+          ++status[i];
+          node_stack.push(t->find(s[i + 1]));
+          break;
+        case 1:
+          ++status[i];
+          if (t->is_end) node_stack.push(dict.root->find(s[i + 1]));
+          break;
+        default:
+          status[i] = 0;
+          node_stack.pop();
+      }
+    }
+
+    return false;
+  }
+};
+```
+
+### Hashtable + DP
+
+```c++
+class Solution {
+ public:
+  bool wordBreak(const string& s, vector<string>& wordDict) {
+    unordered_set<string> dict;
+    for (auto& i : wordDict) dict.insert(i);
+    auto exists = [&s, &dict](int start, int end) {
+      return dict.find({s.begin() + start, s.begin() + end + 1}) != dict.end();
+    };
+    int N = s.size();
+    vector<bool> avail(N, false);
+    avail[0] = exists(0, 0);
+    for (int i = 1; i < N; ++i) {
+      if (exists(0, i)) {
+        avail[i] = true;
+        continue;
+      }
+      for (int j = i; j >= 1; --j) {
+        if (avail[j - 1] && exists(j, i)) {
+          avail[i] = true;
+          break;
+        }
+      }
+    }
+    return avail.back();
+  }
+};
+```
+
