@@ -11,8 +11,8 @@
 class Solution {
   struct Node {
     char c{'.'};
-    int word_ID{-1};
-    vector<array<int, 2>> candidates;
+    int word_ID{-1}, depth{-1};
+    vector<int> candidates;
     unordered_map<char, Node*> s;
     Node() {}
     Node(char c) : c(c) {}
@@ -30,12 +30,12 @@ class Solution {
     ~Dictionary() { delete root; }
     void add_word(const string& word, int ID) {
       Node* r = root;
-      r->candidates.push_back({ID, -1});
+      r->candidates.push_back(ID);
       int i = 0;
       while (i < word.size()) {
         Node* n = r->find(word[i]);
         if (!n) break;
-        if (i < word.size() - 1) n->candidates.push_back({ID, i});
+        if (i < word.size() - 1) n->candidates.push_back(ID);
         r = n;
         ++i;
       }
@@ -48,7 +48,8 @@ class Solution {
       Node* r = root;
       for (int i = start; i < word.size(); ++i) {
         Node* n = new Node(word[i]);
-        if (i < word.size() - 1) n->candidates.push_back({ID, i});
+        n->depth = r->depth + 1;
+        if (i < word.size() - 1) n->candidates.push_back(ID);
         r->s[word[i]] = n;
         r = n;
       }
@@ -64,20 +65,19 @@ class Solution {
   void find_pair(const vector<string>& words, int ID, const Dictionary& dict,
                  vector<vector<int>>& rst) {
     Node* r = dict.root;
-    if (r->word_ID != -1 && is_palindrom(words[ID], 0, words[ID].size() - 1) &&
-        r->word_ID != ID)
+    if (r->word_ID != -1 && r->word_ID != ID &&
+        is_palindrom(words[ID], 0, words[ID].size() - 1))
       rst.push_back({r->word_ID, ID});
     for (int i = words[ID].size() - 1; i >= 0; --i) {
       r = r->find(words[ID][i]);
       if (!r) return;
-      if (r->word_ID != -1 && is_palindrom(words[ID], 0, i - 1) &&
-          r->word_ID != ID)
+      if (r->word_ID != -1 && r->word_ID != ID &&
+          is_palindrom(words[ID], 0, i - 1))
         rst.push_back({r->word_ID, ID});
     }
     for (auto& i : r->candidates)
-      if (is_palindrom(words[i[0]], i[1] + 1, words[i[0]].size() - 1) &&
-          i[0] != ID)
-        rst.push_back({i[0], ID});
+      if (i != ID && is_palindrom(words[i], r->depth + 1, words[i].size() - 1))
+        rst.push_back({i, ID});
   }
 
  public:
