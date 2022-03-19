@@ -35,19 +35,42 @@ struct TreeNode {
   TreeNode(int x) : val(x) {}
 };
 
-TreeNode* build_tree(const vector<int>& vals) {
-  auto root = new TreeNode(vals[0]);
+class Node {
+ public:
+  int val;
+  Node* left;
+  Node* right;
 
-  queue<TreeNode*> q;
+  Node() {}
+
+  Node(int _val) {
+    val = _val;
+    left = NULL;
+    right = NULL;
+  }
+
+  Node(int _val, Node* _left, Node* _right) {
+    val = _val;
+    left = _left;
+    right = _right;
+  }
+};
+
+
+template <typename T>
+T* build_tree(const vector<int>& vals) {
+  auto root = new T(vals[0]);
+
+  queue<T*> q;
   q.push(root);
   int i = 0;
   while (!q.empty() && i < vals.size()) {
     if (vals[++i] != MAX_INT) {
-      q.front()->left = new TreeNode(vals[i]);
+      q.front()->left = new T(vals[i]);
       q.push(q.front()->left);
     }
     if (vals[++i] != MAX_INT) {
-      q.front()->right = new TreeNode(vals[i]);
+      q.front()->right = new T(vals[i]);
       q.push(q.front()->right);
     }
     q.pop();
